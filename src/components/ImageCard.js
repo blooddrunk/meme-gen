@@ -6,6 +6,7 @@ import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SaveIcon from '@material-ui/icons/Save';
+import ReactResizeDetector from 'react-resize-detector';
 
 import ImagePreview from './ImagePreview';
 import defaultImage from './luxun_1.jpg';
@@ -40,8 +41,6 @@ export class ImageCard extends Component {
     image.onload = () => {
       this.setState({
         uploadedImage: image,
-        originalWidth: image.width,
-        originalHeight: image.height,
       });
     };
   }
@@ -50,31 +49,37 @@ export class ImageCard extends Component {
     const { uploadedImage } = this.state;
 
     return (
-      <Card>
-        <CardHeader title="图片预览" />
-        <CardContent>
-          <ImagePreview image={uploadedImage} />
-        </CardContent>
-        <CardActions>
-          <input
-            onChange={this.handleFileUpload}
-            accept="image/*"
-            style={{ display: 'none' }}
-            id="upload-image"
-            type="file"
-          />
-          <label htmlFor="upload-image">
-            <Button component="span" color="primary">
-              Upload
-              <CloudUploadIcon style={rightIconStyle} />
-            </Button>
-          </label>
-          <Button color="default">
-            Save
-            <SaveIcon style={rightIconStyle} />
-          </Button>
-        </CardActions>
-      </Card>
+      <ReactResizeDetector handleWidth handleHeight refreshMode="debounce" refreshRate={300}>
+        {(width, height) => {
+          return (
+            <Card>
+              <CardHeader title="图片预览" />
+              <CardContent>
+                <ImagePreview image={uploadedImage} />
+              </CardContent>
+              <CardActions>
+                <input
+                  onChange={this.handleFileUpload}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="upload-image"
+                  type="file"
+                />
+                <label htmlFor="upload-image">
+                  <Button component="span" color="primary">
+                    Upload
+                    <CloudUploadIcon style={rightIconStyle} />
+                  </Button>
+                </label>
+                <Button color="default">
+                  Save
+                  <SaveIcon style={rightIconStyle} />
+                </Button>
+              </CardActions>
+            </Card>
+          );
+        }}
+      </ReactResizeDetector>
     );
   }
 }

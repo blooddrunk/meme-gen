@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Stage, Layer, Image } from 'react-konva';
-import ReactResizeDetector from 'react-resize-detector';
 
 class ImagePreview extends Component {
   static propTypes = {
