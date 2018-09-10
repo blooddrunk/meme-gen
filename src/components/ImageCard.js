@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -11,13 +13,24 @@ import ReactResizeDetector from 'react-resize-detector';
 import ImagePreview from './ImagePreview';
 import defaultImage from './luxun_1.jpg';
 
+const CenteredCardContent = styled(CardContent)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 const rightIconStyle = {
   marginLeft: 8,
 };
 
 export class ImageCard extends Component {
+  static propTypes = {
+    dictum: PropTypes.string.isRequired,
+  };
+
   state = {
     uploadedImage: null,
+    transformedImageURL: '',
   };
 
   componentDidMount = () => {
@@ -35,6 +48,10 @@ export class ImageCard extends Component {
     }
   };
 
+  handleFileDownload = async file => {
+    const { saveAs } = await import('file-saver');
+  };
+
   _createImage(src) {
     const image = new Image();
     image.src = src;
@@ -46,7 +63,8 @@ export class ImageCard extends Component {
   }
 
   render() {
-    const { uploadedImage } = this.state;
+    const { dictum } = this.props;
+    const { uploadedImage, transformedImageURL } = this.state;
 
     return (
       <ReactResizeDetector handleWidth handleHeight refreshMode="debounce" refreshRate={300}>
@@ -54,9 +72,13 @@ export class ImageCard extends Component {
           return (
             <Card>
               <CardHeader title="图片预览" />
-              <CardContent>
-                <ImagePreview image={uploadedImage} />
-              </CardContent>
+              <CenteredCardContent>
+                <ImagePreview
+                  image={uploadedImage}
+                  dictum={dictum}
+                  onFileDownload={this.handleFileDownload}
+                />
+              </CenteredCardContent>
               <CardActions>
                 <input
                   onChange={this.handleFileUpload}
@@ -71,7 +93,7 @@ export class ImageCard extends Component {
                     <CloudUploadIcon style={rightIconStyle} />
                   </Button>
                 </label>
-                <Button color="default">
+                <Button color="default" href={transformedImageURL} download="test.png">
                   Save
                   <SaveIcon style={rightIconStyle} />
                 </Button>
