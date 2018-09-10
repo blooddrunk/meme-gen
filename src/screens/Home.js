@@ -17,8 +17,6 @@ export default class Home extends Component {
     dictum: randomDictum(),
   };
 
-  handleImageGenerate = () => {};
-
   handleDictumChange = ({ target }) => {
     this.setState({ dictum: target.value });
   };
@@ -39,7 +37,6 @@ export default class Home extends Component {
           <Grid item xs={12} md>
             <DictumEdit
               dictum={dictum}
-              onImageGenerate={this.handleImageGenerate}
               onDictumChange={this.handleDictumChange}
               onDictumShuffle={this.handleDictumShuffle}
             />

@@ -93,7 +93,7 @@ export class ImageCard extends Component {
                     <CloudUploadIcon style={rightIconStyle} />
                   </Button>
                 </label>
-                <Button color="default" href={transformedImageURL} download="test.png">
+                <Button color="default">
                   Save
                   <SaveIcon style={rightIconStyle} />
                 </Button>

@@ -9,7 +9,6 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Switch from '@material-ui/core/Switch';
 import Button from '@material-ui/core/Button';
 import CachedIcon from '@material-ui/icons/Cached';
-import PublishIcon from '@material-ui/icons/Publish';
 
 const rightIconStyle = {
   marginLeft: 8,
@@ -18,7 +17,6 @@ const rightIconStyle = {
 export class DictumEdit extends Component {
   static propTypes = {
     dictum: PropTypes.string.isRequired,
-    onImageGenerate: PropTypes.func.isRequired,
     onDictumChange: PropTypes.func.isRequired,
     onDictumShuffle: PropTypes.func.isRequired,
   };
@@ -36,7 +34,7 @@ export class DictumEdit extends Component {
   };
 
   render() {
-    const { dictum, onImageGenerate, onDictumChange, onDictumShuffle } = this.props;
+    const { dictum, onDictumChange, onDictumShuffle } = this.props;
     const { multiline } = this.state;
 
     return (
@@ -62,10 +60,6 @@ export class DictumEdit extends Component {
           />
         </CardContent>
         <CardActions>
-          <Button color="primary" variant="contained" onClick={onImageGenerate}>
-            生成
-            <PublishIcon style={rightIconStyle} />
-          </Button>
           <Button color="default" onClick={onDictumShuffle}>
             随机
             <CachedIcon style={rightIconStyle} />

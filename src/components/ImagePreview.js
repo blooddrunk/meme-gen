@@ -48,7 +48,12 @@ class ImagePreview extends PureComponent {
     const dictumLineNum = dictum.split('\n').length;
 
     return (
-      <Stage width={width} height={height} scale={{ x: scale, y: scale }}>
+      <Stage
+        ref={stage => (this.stage = stage)}
+        width={width}
+        height={height}
+        scale={{ x: scale, y: scale }}
+      >
         <Layer>
           <Image image={image} />
           {image && (
