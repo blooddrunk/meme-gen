@@ -7,8 +7,10 @@ import CardActions from '@material-ui/core/CardActions';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Switch from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import CachedIcon from '@material-ui/icons/Cached';
+import Collapse from '@material-ui/core/Collapse';
 
 const rightIconStyle = {
   marginLeft: 8,
@@ -17,7 +19,10 @@ const rightIconStyle = {
 export class DictumEdit extends Component {
   static propTypes = {
     dictum: PropTypes.string.isRequired,
+    author: PropTypes.string,
     onDictumChange: PropTypes.func.isRequired,
+    onAuthorToggle: PropTypes.func.isRequired,
+    onAuthorChange: PropTypes.func.isRequired,
     onDictumShuffle: PropTypes.func.isRequired,
   };
 
@@ -33,8 +38,17 @@ export class DictumEdit extends Component {
     this.setState({ dictum: target.value });
   };
 
+  handle;
+
   render() {
-    const { dictum, onDictumChange, onDictumShuffle } = this.props;
+    const {
+      dictum,
+      author,
+      onDictumChange,
+      onAuthorToggle,
+      onAuthorChange,
+      onDictumShuffle,
+    } = this.props;
     const { multiline } = this.state;
 
     return (
@@ -58,6 +72,20 @@ export class DictumEdit extends Component {
               ),
             }}
           />
+          <FormControlLabel
+            control={<Switch color="primary" checked={!!author} onChange={onAuthorToggle} />}
+            label="显示出处"
+          />
+          <Collapse in={!!author}>
+            <TextField
+              label="请输入出处"
+              value={author}
+              placeholder="请输入出处"
+              fullWidth
+              margin="normal"
+              onChange={onAuthorChange}
+            />
+          </Collapse>
         </CardContent>
         <CardActions>
           <Button color="default" onClick={onDictumShuffle}>

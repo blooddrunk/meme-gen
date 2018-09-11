@@ -5,6 +5,7 @@ import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SaveIcon from '@material-ui/icons/Save';
@@ -27,6 +28,7 @@ const rightIconStyle = {
 export class ImageCard extends Component {
   static propTypes = {
     dictum: PropTypes.string.isRequired,
+    author: PropTypes.string,
   };
 
   constructor(props) {
@@ -75,14 +77,19 @@ export class ImageCard extends Component {
   }
 
   render() {
-    const { dictum } = this.props;
+    const { dictum, author } = this.props;
     const { uploadedImage } = this.state;
 
     return (
       <Card>
         <CardHeader title="图片预览" />
         <CenteredCardContent>
-          <ImagePreview forwardRef={this.canvasRef} image={uploadedImage} dictum={dictum} />
+          <ImagePreview
+            forwardRef={this.canvasRef}
+            image={uploadedImage}
+            dictum={dictum}
+            author={author}
+          />
         </CenteredCardContent>
         <CardActions>
           <input
@@ -111,6 +118,15 @@ export class ImageCard extends Component {
             </Tooltip>
           </Fragment>
         </CardActions>
+        <CardContent>
+          <Typography component="p" color="textSecondary" gutterBottom>
+            Image might overflow with insufficient space, click Save button to preview whole
+          </Typography>
+          <Typography component="p" color="textSecondary">
+            Failed to find a clipboard api to programmatically copy canvas/image, right click and
+            select 'Copy image' works though
+          </Typography>
+        </CardContent>
       </Card>
     );
   }

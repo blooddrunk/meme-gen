@@ -15,10 +15,19 @@ const Container = styled.section`
 export default class Home extends Component {
   state = {
     dictum: randomDictum(),
+    author: '鲁迅',
   };
 
   handleDictumChange = ({ target }) => {
     this.setState({ dictum: target.value });
+  };
+
+  handleAuthorToggle = ({ target }) => {
+    this.setState({ author: target.checked ? '鲁迅' : '' });
+  };
+
+  handleAuthorChange = ({ target }) => {
+    this.setState({ author: target.value });
   };
 
   handleDictumShuffle = () => {
@@ -26,18 +35,21 @@ export default class Home extends Component {
   };
 
   render() {
-    const { dictum } = this.state;
+    const { dictum, author } = this.state;
 
     return (
       <Container>
         <Grid container spacing={24}>
           <Grid item xs={12} md>
-            <ImageCard dictum={dictum} />
+            <ImageCard dictum={dictum} author={author} />
           </Grid>
           <Grid item xs={12} md>
             <DictumEdit
               dictum={dictum}
+              author={author}
               onDictumChange={this.handleDictumChange}
+              onAuthorToggle={this.handleAuthorToggle}
+              onAuthorChange={this.handleAuthorChange}
               onDictumShuffle={this.handleDictumShuffle}
             />
           </Grid>

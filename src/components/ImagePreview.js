@@ -7,6 +7,7 @@ class ImagePreview extends PureComponent {
   static propTypes = {
     image: PropTypes.object,
     dictum: PropTypes.string.isRequired,
+    author: PropTypes.string,
     containerWidth: PropTypes.number,
     containerHeight: PropTypes.number,
   };
@@ -23,8 +24,12 @@ class ImagePreview extends PureComponent {
     this.dictumTextRef = React.createRef();
   }
 
-  componentDidUpdate = ({ image, dictum }, prevState) => {
-    if (image !== this.props.image || dictum !== this.props.dictum) {
+  componentDidUpdate = ({ image, dictum, author }) => {
+    if (
+      image !== this.props.image ||
+      dictum !== this.props.dictum ||
+      author !== this.props.author
+    ) {
       const stage = this.props.forwardRef.current.getStage();
       const authorText = this.authorTextRef.current;
       const dictumText = this.dictumTextRef.current;
@@ -60,7 +65,7 @@ class ImagePreview extends PureComponent {
   };
 
   render() {
-    const { image, dictum, containerWidth, containerHeight, forwardRef } = this.props;
+    const { image, dictum, author, containerWidth, containerHeight, forwardRef } = this.props;
     const scale = this._computeScale(containerWidth, containerHeight, image);
     const { width, height } = this._computeSize(image, scale, containerWidth, containerWidth);
 
@@ -86,7 +91,7 @@ class ImagePreview extends PureComponent {
                 width={width}
                 y={height}
                 fill="white"
-                text="——鲁迅"
+                text={author && `——${author}`}
                 padding={16}
                 fontSize={30}
                 align="right"
