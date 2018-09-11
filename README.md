@@ -2,4 +2,5 @@
 
 - [ ] Use `mobx` and `mobx-state-tree` to maintain state
 - [ ] Generate dictums from api
-- [ ] Nicer font and more reasonable line height
+- [x] Nicer font and more reasonable line height
+- [ ] Optimize for mobile devices

@@ -103,7 +103,7 @@ export class ImageCard extends Component {
             <SaveIcon style={rightIconStyle} />
           </Button>
           <Fragment>
-            <Tooltip title="Not supported yet!">
+            <Tooltip disableTouchListener title="Not supported yet!">
               <Button color="default" onClick={this.handleFileCopy}>
                 Copy
                 <FileCopyIcon style={rightIconStyle} />

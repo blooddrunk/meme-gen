@@ -16,6 +16,25 @@ class ImagePreview extends PureComponent {
     containerHeight: 600,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.authorTextRef = React.createRef();
+    this.dictumTextRef = React.createRef();
+  }
+
+  componentDidUpdate = ({ image, dictum }, prevState) => {
+    if (image !== this.props.image || dictum !== this.props.dictum) {
+      const stage = this.props.forwardRef.current.getStage();
+      const authorText = this.authorTextRef.current;
+      const dictumText = this.dictumTextRef.current;
+
+      const authorTextY = stage.getHeight() - authorText.getHeight();
+      authorText.y(authorTextY);
+      dictumText.y(authorTextY - dictumText.getHeight());
+    }
+  };
+
   _computeScale = memoize((containerWidth, containerHeight, image) => {
     if (!image) {
       return 1;
@@ -44,32 +63,35 @@ class ImagePreview extends PureComponent {
     const { image, dictum, containerWidth, containerHeight, forwardRef } = this.props;
     const scale = this._computeScale(containerWidth, containerHeight, image);
     const { width, height } = this._computeSize(image, scale, containerWidth, containerWidth);
-    const dictumLineNum = dictum.split('\n').length;
 
     return (
-      <Stage ref={forwardRef} width={width} height={height} scale={{ x: scale, y: scale }}>
+      <Stage ref={forwardRef} width={width} height={height}>
         <Layer>
-          <Image image={image} listening />
+          <Image image={image} preventDefault={false} scale={{ x: scale, y: scale }} />
           {image && (
             <Fragment>
               <Text
-                width={width / scale}
-                y={(height - (dictumLineNum + 1) * 36) / scale}
+                ref={this.dictumTextRef}
+                width={width}
+                y={height}
                 fill="white"
                 text={dictum}
                 fontSize={36}
                 align="center"
                 verticalAlign="bottom"
+                preventDefault={false}
               />
               <Text
-                width={width / scale}
-                y={(height - 52) / scale}
+                ref={this.authorTextRef}
+                width={width}
+                y={height}
                 fill="white"
                 text="——鲁迅"
                 padding={16}
-                fontSize={36}
+                fontSize={30}
                 align="right"
                 verticalAlign="bottom"
+                preventDefault={false}
               />
             </Fragment>
           )}
