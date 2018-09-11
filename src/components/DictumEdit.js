@@ -46,7 +46,7 @@ export class DictumEdit extends Component {
             multiline={multiline}
             value={dictum}
             placeholder="请输入文字内容"
-            helperText="使用右侧开关切换多行模式"
+            helperText={multiline ? '回车进入下一行' : '使用右侧开关切换多行模式'}
             fullWidth
             margin="normal"
             onChange={onDictumChange}

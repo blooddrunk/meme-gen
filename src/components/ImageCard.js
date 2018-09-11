@@ -8,7 +8,7 @@ import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SaveIcon from '@material-ui/icons/Save';
-import ReactResizeDetector from 'react-resize-detector';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 import ImagePreview from './ImagePreview';
 import defaultImage from './luxun_1.jpg';
@@ -28,9 +28,14 @@ export class ImageCard extends Component {
     dictum: PropTypes.string.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.canvasRef = React.createRef();
+  }
+
   state = {
     uploadedImage: null,
-    transformedImageURL: '',
   };
 
   componentDidMount = () => {
@@ -50,7 +55,13 @@ export class ImageCard extends Component {
 
   handleFileDownload = async file => {
     const { saveAs } = await import('file-saver');
+    const canvas = this.canvasRef.current.getStage().toCanvas();
+    canvas.toBlob(blob => {
+      saveAs(blob, 'pretty image.png');
+    });
   };
+
+  handleFileCopy = () => {};
 
   _createImage(src) {
     const image = new Image();
@@ -64,44 +75,38 @@ export class ImageCard extends Component {
 
   render() {
     const { dictum } = this.props;
-    const { uploadedImage, transformedImageURL } = this.state;
+    const { uploadedImage } = this.state;
 
     return (
-      <ReactResizeDetector handleWidth handleHeight refreshMode="debounce" refreshRate={300}>
-        {(width, height) => {
-          return (
-            <Card>
-              <CardHeader title="图片预览" />
-              <CenteredCardContent>
-                <ImagePreview
-                  image={uploadedImage}
-                  dictum={dictum}
-                  onFileDownload={this.handleFileDownload}
-                />
-              </CenteredCardContent>
-              <CardActions>
-                <input
-                  onChange={this.handleFileUpload}
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  id="upload-image"
-                  type="file"
-                />
-                <label htmlFor="upload-image">
-                  <Button component="span" color="primary">
-                    Upload
-                    <CloudUploadIcon style={rightIconStyle} />
-                  </Button>
-                </label>
-                <Button color="default">
-                  Save
-                  <SaveIcon style={rightIconStyle} />
-                </Button>
-              </CardActions>
-            </Card>
-          );
-        }}
-      </ReactResizeDetector>
+      <Card>
+        <CardHeader title="图片预览" />
+        <CenteredCardContent>
+          <ImagePreview forwardRef={this.canvasRef} image={uploadedImage} dictum={dictum} />
+        </CenteredCardContent>
+        <CardActions>
+          <input
+            onChange={this.handleFileUpload}
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="upload-image"
+            type="file"
+          />
+          <label htmlFor="upload-image">
+            <Button component="span" color="primary">
+              Upload
+              <CloudUploadIcon style={rightIconStyle} />
+            </Button>
+          </label>
+          <Button color="default" onClick={this.handleFileDownload}>
+            Save
+            <SaveIcon style={rightIconStyle} />
+          </Button>
+          <Button color="default" onClick={this.handleFileCopy}>
+            Copy
+            <FileCopyIcon style={rightIconStyle} />
+          </Button>
+        </CardActions>
+      </Card>
     );
   }
 }

@@ -9,7 +9,6 @@ class ImagePreview extends PureComponent {
     dictum: PropTypes.string.isRequired,
     containerWidth: PropTypes.number,
     containerHeight: PropTypes.number,
-    onFileDownload: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -42,20 +41,15 @@ class ImagePreview extends PureComponent {
   };
 
   render() {
-    const { image, dictum, containerWidth, containerHeight } = this.props;
+    const { image, dictum, containerWidth, containerHeight, forwardRef } = this.props;
     const scale = this._computeScale(containerWidth, containerHeight, image);
     const { width, height } = this._computeSize(image, scale, containerWidth, containerWidth);
     const dictumLineNum = dictum.split('\n').length;
 
     return (
-      <Stage
-        ref={stage => (this.stage = stage)}
-        width={width}
-        height={height}
-        scale={{ x: scale, y: scale }}
-      >
+      <Stage ref={forwardRef} width={width} height={height} scale={{ x: scale, y: scale }}>
         <Layer>
-          <Image image={image} />
+          <Image image={image} listening />
           {image && (
             <Fragment>
               <Text
