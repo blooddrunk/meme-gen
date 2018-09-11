@@ -6,3 +6,5 @@
 - [ ] Optimize for mobile devices
 - [ ] Avoid unnecessary update
 - [ ] Allow customizing text color
+- [ ] Unit test
+- [ ] Image gallery
