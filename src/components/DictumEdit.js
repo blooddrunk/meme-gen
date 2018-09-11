@@ -61,7 +61,7 @@ export class DictumEdit extends Component {
         </CardContent>
         <CardActions>
           <Button color="default" onClick={onDictumShuffle}>
-            随机
+            RANDOM
             <CachedIcon style={rightIconStyle} />
           </Button>
         </CardActions>

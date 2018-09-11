@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Card from '@material-ui/core/Card';
@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SaveIcon from '@material-ui/icons/Save';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import ImagePreview from './ImagePreview';
 import defaultImage from './luxun_1.jpg';
@@ -97,14 +98,18 @@ export class ImageCard extends Component {
               <CloudUploadIcon style={rightIconStyle} />
             </Button>
           </label>
-          <Button color="default" onClick={this.handleFileDownload}>
+          <Button color="secondary" onClick={this.handleFileDownload}>
             Save
             <SaveIcon style={rightIconStyle} />
           </Button>
-          <Button color="default" onClick={this.handleFileCopy}>
-            Copy
-            <FileCopyIcon style={rightIconStyle} />
-          </Button>
+          <Fragment>
+            <Tooltip title="Not supported yet!">
+              <Button color="default" onClick={this.handleFileCopy}>
+                Copy
+                <FileCopyIcon style={rightIconStyle} />
+              </Button>
+            </Tooltip>
+          </Fragment>
         </CardActions>
       </Card>
     );

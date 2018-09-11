@@ -10,6 +10,10 @@ const Container = styled.div`
   height: 100vh;
 `;
 
+const SubTitle = styled(Typography)`
+  padding-left: 24px;
+`;
+
 const Content = styled.section`
   flex-grow: 1;
   padding: 24px;
@@ -22,6 +26,7 @@ const Root = ({ children }) => (
         <Typography variant="title" color="inherit">
           MEME
         </Typography>
+        <SubTitle color="inherit">For modern browsers only</SubTitle>
       </Toolbar>
     </AppBar>
     <Content>{children}</Content>
