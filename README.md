@@ -7,4 +7,5 @@
 - [ ] Avoid unnecessary update
 - [ ] Allow customizing text color
 - [ ] Unit test
+- [ ] Arbitrary image src
 - [ ] Image gallery

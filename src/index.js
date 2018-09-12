@@ -2,11 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './App';
-import configureStore from './store/configureStore';
+import { BuilderStore } from './stores/Builder';
 import registerServiceWorker from './registerServiceWorker';
 
-const store = configureStore({ test: '奇子是猪🐷' });
-
-ReactDOM.render(<App store={store} />, document.getElementById('root'));
+ReactDOM.render(<App store={BuilderStore} />, document.getElementById('root'));
 
 registerServiceWorker();

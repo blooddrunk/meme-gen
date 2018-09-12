@@ -56,7 +56,7 @@ export class DictumEdit extends Component {
         <CardHeader title="内容编辑" />
         <CardContent>
           <TextField
-            label="请输入文字内容"
+            label="文字内容"
             multiline={multiline}
             value={dictum}
             placeholder="请输入文字内容"
@@ -78,7 +78,7 @@ export class DictumEdit extends Component {
           />
           <Collapse in={!!author}>
             <TextField
-              label="请输入出处"
+              label="出处"
               value={author}
               placeholder="请输入出处"
               fullWidth

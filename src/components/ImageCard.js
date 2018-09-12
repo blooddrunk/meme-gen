@@ -13,7 +13,7 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import ImagePreview from './ImagePreview';
-import defaultImage from './luxun_1.jpg';
+import defaultImage from '../assets/images/luxun_1.jpg';
 
 const CenteredCardContent = styled(CardContent)`
   display: flex;
