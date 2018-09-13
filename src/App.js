@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { Provider } from 'mobx-react';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { create } from 'jss';
@@ -25,15 +26,19 @@ class App extends Component {
   };
 
   render() {
+    const { store } = this.props;
+
     return (
-      <JssProvider jss={jss} generateClassName={generateClassName}>
-        <MuiThemeProvider theme={theme}>
-          <Fragment>
-            <Root />
-            <CssBaseline />
-          </Fragment>
-        </MuiThemeProvider>
-      </JssProvider>
+      <Provider store={store}>
+        <JssProvider jss={jss} generateClassName={generateClassName}>
+          <MuiThemeProvider theme={theme}>
+            <Fragment>
+              <Root />
+              <CssBaseline />
+            </Fragment>
+          </MuiThemeProvider>
+        </JssProvider>
+      </Provider>
     );
   }
 }

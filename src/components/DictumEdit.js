@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { inject, observer } from 'mobx-react';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -16,40 +17,35 @@ const rightIconStyle = {
   marginLeft: 8,
 };
 
+@inject(({ store }) => ({
+  builder: store.builder,
+}))
+@observer
 export class DictumEdit extends Component {
   static propTypes = {
-    dictum: PropTypes.string.isRequired,
-    author: PropTypes.string,
-    onDictumChange: PropTypes.func.isRequired,
-    onAuthorToggle: PropTypes.func.isRequired,
-    onAuthorChange: PropTypes.func.isRequired,
-    onDictumShuffle: PropTypes.func.isRequired,
+    builder: PropTypes.object.isRequired,
   };
 
-  state = {
-    multiline: false,
-  };
-
-  handleToggleMultiline = ({ target }) => {
-    this.setState({ multiline: target.checked });
+  handleMultilineToggle = ({ target }) => {
+    this.props.builder.toggleMultiline(target.checked);
   };
 
   handleDictumChange = ({ target }) => {
-    this.setState({ dictum: target.value });
+    this.props.builder.changeDictum(target.value);
   };
 
-  handle;
+  handleAuthorToggle = ({ target }) => {
+    this.props.builder.changeAuthor(target.checked ? '鲁迅' : '');
+  };
+
+  handleAuthorChange = ({ target }) => {
+    this.props.builder.changeAuthor(target.value);
+  };
 
   render() {
     const {
-      dictum,
-      author,
-      onDictumChange,
-      onAuthorToggle,
-      onAuthorChange,
-      onDictumShuffle,
+      builder: { dictum, author, authorVisible, multiline, drawDictum },
     } = this.props;
-    const { multiline } = this.state;
 
     return (
       <Card>
@@ -63,32 +59,34 @@ export class DictumEdit extends Component {
             helperText={multiline ? '回车进入下一行' : '使用右侧开关切换多行模式'}
             fullWidth
             margin="normal"
-            onChange={onDictumChange}
+            onChange={this.handleDictumChange}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <Switch checked={multiline} onChange={this.handleToggleMultiline} />
+                  <Switch checked={multiline} onChange={this.handleMultilineToggle} />
                 </InputAdornment>
               ),
             }}
           />
           <FormControlLabel
-            control={<Switch color="primary" checked={!!author} onChange={onAuthorToggle} />}
+            control={
+              <Switch color="primary" checked={authorVisible} onChange={this.handleAuthorToggle} />
+            }
             label="显示出处"
           />
-          <Collapse in={!!author}>
+          <Collapse in={authorVisible}>
             <TextField
               label="出处"
               value={author}
               placeholder="请输入出处"
               fullWidth
               margin="normal"
-              onChange={onAuthorChange}
+              onChange={this.handleAuthorChange}
             />
           </Collapse>
         </CardContent>
         <CardActions>
-          <Button color="default" onClick={onDictumShuffle}>
+          <Button color="default" onClick={drawDictum}>
             RANDOM
             <CachedIcon style={rightIconStyle} />
           </Button>

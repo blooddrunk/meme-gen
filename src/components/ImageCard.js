@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Card from '@material-ui/core/Card';
@@ -25,8 +26,12 @@ const rightIconStyle = {
   marginLeft: 8,
 };
 
+@inject(({ store }) => ({
+  builder: store.builder,
+}))
 export class ImageCard extends Component {
   static propTypes = {
+    builder: PropTypes.object.isRequired,
     dictum: PropTypes.string.isRequired,
     author: PropTypes.string,
   };
@@ -51,6 +56,7 @@ export class ImageCard extends Component {
       const fileReader = new FileReader();
       fileReader.addEventListener('load', () => {
         this._createImage(fileReader.result);
+        this.props.builder.changeImage(fileReader.result);
       });
       fileReader.readAsDataURL(file);
     }

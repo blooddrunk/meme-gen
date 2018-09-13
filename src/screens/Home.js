@@ -18,22 +18,6 @@ export default class Home extends Component {
     author: '鲁迅',
   };
 
-  handleDictumChange = ({ target }) => {
-    this.setState({ dictum: target.value });
-  };
-
-  handleAuthorToggle = ({ target }) => {
-    this.setState({ author: target.checked ? '鲁迅' : '' });
-  };
-
-  handleAuthorChange = ({ target }) => {
-    this.setState({ author: target.value });
-  };
-
-  handleDictumShuffle = () => {
-    this.setState({ dictum: randomDictum() });
-  };
-
   render() {
     const { dictum, author } = this.state;
 
@@ -44,14 +28,7 @@ export default class Home extends Component {
             <ImageCard dictum={dictum} author={author} />
           </Grid>
           <Grid item xs={12} md>
-            <DictumEdit
-              dictum={dictum}
-              author={author}
-              onDictumChange={this.handleDictumChange}
-              onAuthorToggle={this.handleAuthorToggle}
-              onAuthorChange={this.handleAuthorChange}
-              onDictumShuffle={this.handleDictumShuffle}
-            />
+            <DictumEdit />
           </Grid>
         </Grid>
       </Container>

@@ -2,9 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './App';
-import { BuilderStore } from './stores/Builder';
+import RootStore from './stores';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<App store={BuilderStore} />, document.getElementById('root'));
+const store = RootStore.create();
+ReactDOM.render(<App store={store} />, document.getElementById('root'));
 
 registerServiceWorker();

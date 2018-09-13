@@ -1,13 +1,18 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { reaction } from 'mobx';
+import { inject, observer } from 'mobx-react';
 import { Stage, Layer, Image, Text } from 'react-konva';
 import memoize from 'memoize-one';
 
-class ImagePreview extends PureComponent {
+@inject(({ store }) => ({
+  builder: store.builder,
+}))
+@observer
+class ImagePreview extends Component {
   static propTypes = {
     image: PropTypes.object,
-    dictum: PropTypes.string.isRequired,
-    author: PropTypes.string,
+    builder: PropTypes.object.isRequired,
     containerWidth: PropTypes.number,
     containerHeight: PropTypes.number,
   };
@@ -20,8 +25,22 @@ class ImagePreview extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.state = {
+      image: null,
+    };
+
     this.authorTextRef = React.createRef();
     this.dictumTextRef = React.createRef();
+
+    reaction(
+      () => props.builder.imageSrc,
+      () => {
+        this._createImage(props.builder.imageSrc);
+      },
+      {
+        fireImmediately: true,
+      }
+    );
   }
 
   componentDidUpdate = ({ image, dictum, author }) => {
@@ -39,6 +58,16 @@ class ImagePreview extends PureComponent {
       dictumText.y(authorTextY - dictumText.getHeight());
     }
   };
+
+  _createImage(src) {
+    const image = new window.Image();
+    image.src = src;
+    image.onload = () => {
+      this.setState({
+        image,
+      });
+    };
+  }
 
   _computeScale = memoize((containerWidth, containerHeight, image) => {
     if (!image) {
@@ -65,7 +94,8 @@ class ImagePreview extends PureComponent {
   };
 
   render() {
-    const { image, dictum, author, containerWidth, containerHeight, forwardRef } = this.props;
+    const { dictum, author, containerWidth, containerHeight, forwardRef } = this.props;
+    const { image } = this.state;
     const scale = this._computeScale(containerWidth, containerHeight, image);
     const { width, height } = this._computeSize(image, scale, containerWidth, containerWidth);
 
