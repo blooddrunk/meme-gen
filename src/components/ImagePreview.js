@@ -45,6 +45,7 @@ class ImagePreview extends Component {
       () => ({
         dictum: this.props.builder.dictum,
         author: this.props.builder.author,
+        textColor: this.props.builder.textColor,
       }),
       props => {
         this.shouldAdjustText = true;
@@ -133,7 +134,7 @@ class ImagePreview extends Component {
 
   render() {
     const {
-      builder: { dictum, author },
+      builder: { dictum, author, textColor },
       containerWidth,
       containerHeight,
       forwardRef,
@@ -153,7 +154,7 @@ class ImagePreview extends Component {
                   ref={this.dictumTextRef}
                   width={width}
                   y={height}
-                  fill="white"
+                  fill={textColor}
                   text={dictum}
                   fontSize={36}
                   align="center"
@@ -164,7 +165,7 @@ class ImagePreview extends Component {
                   ref={this.authorTextRef}
                   width={width}
                   y={height}
-                  fill="white"
+                  fill={textColor}
                   text={author && `——${author}`}
                   padding={16}
                   fontSize={30}

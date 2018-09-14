@@ -13,6 +13,8 @@ import Button from '@material-ui/core/Button';
 import CachedIcon from '@material-ui/icons/Cached';
 import RestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 import Collapse from '@material-ui/core/Collapse';
+import Typography from '@material-ui/core/Typography';
+import { TwitterPicker } from 'react-color';
 
 const rightIconStyle = {
   marginLeft: 8,
@@ -43,9 +45,13 @@ export class DictumEdit extends Component {
     this.props.builder.changeAuthor(target.value);
   };
 
+  handleColorChange = ({ hex }) => {
+    this.props.builder.changeTextColor(hex);
+  };
+
   render() {
     const {
-      builder: { dictum, author, authorVisible, multiline, drawDictum, reset },
+      builder: { dictum, author, authorVisible, multiline, textColor, drawDictum, reset },
     } = this.props;
 
     return (
@@ -70,12 +76,24 @@ export class DictumEdit extends Component {
             }}
           />
         </CardContent>
+
         <CardActions>
-          <Button color="default" onClick={drawDictum}>
+          <Button color="default" variant="contained" onClick={drawDictum}>
             RANDOM
             <CachedIcon style={rightIconStyle} />
           </Button>
         </CardActions>
+
+        <CardContent>
+          <Typography component="p" color="textSecondary" gutterBottom>
+            设置文字颜色
+          </Typography>
+          <TwitterPicker
+            triangle="hide"
+            color={textColor}
+            onChangeComplete={this.handleColorChange}
+          />
+        </CardContent>
 
         <CardContent>
           <FormControlLabel
@@ -96,7 +114,7 @@ export class DictumEdit extends Component {
           </Collapse>
         </CardContent>
         <CardActions>
-          <Button color="default" onClick={reset}>
+          <Button color="secondary" variant="contained" onClick={reset}>
             RESET
             <RestoreIcon style={rightIconStyle} />
           </Button>

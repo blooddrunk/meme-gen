@@ -10,6 +10,7 @@ export const Builder = types
     imageSrc: defaultImageSrc,
     imageLoading: false,
     multiline: false,
+    textColor: '#FFF',
   })
   .views(self => ({
     get authorVisible() {
@@ -33,6 +34,10 @@ export const Builder = types
       self.imageSrc = src;
     },
 
+    changeTextColor(color) {
+      self.textColor = color;
+    },
+
     toggleLoading(loading) {
       self.imageLoading = loading;
     },
@@ -45,5 +50,6 @@ export const Builder = types
       self.imageSrc = defaultImageSrc;
       self.dictum = randomDictum();
       self.author = '鲁迅';
+      self.textColor = '#FFF';
     },
   }));

@@ -5,7 +5,7 @@
 - [x] Nicer font and more reasonable line height
 - [ ] Optimize for mobile devices
 - [ ] Avoid unnecessary update
-- [ ] Allow customizing text color
+- [x] Allow customizing text color
 - [ ] Unit test
 - [x] External image src
 - [ ] Image loading indicator
