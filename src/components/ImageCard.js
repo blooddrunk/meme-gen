@@ -17,7 +17,6 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
 import Snackbar from '@material-ui/core/Snackbar';
-import CloseIcon from '@material-ui/icons/Close';
 
 import ImagePreview from './ImagePreview';
 
@@ -177,19 +176,14 @@ export class ImageCard extends Component {
           }}
           message={
             <span id="message-id">
-              External image may not be download this way. Right click and select 'Copy image'
-              instead
+              External image may not be downloaded this way. Right click and select 'Save image
+              as...' instead
             </span>
           }
           action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              onClick={this.handleSnackbarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
+            <Button key="close" color="secondary" size="small" onClick={this.handleSnackbarClose}>
+              CLOSE
+            </Button>,
           ]}
         />
       </Fragment>
