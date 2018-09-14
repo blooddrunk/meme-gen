@@ -90,6 +90,7 @@ export class DictumEdit extends Component {
           </Typography>
           <TwitterPicker
             triangle="hide"
+            width="280px"
             color={textColor}
             onChangeComplete={this.handleColorChange}
           />
