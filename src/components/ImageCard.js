@@ -16,6 +16,8 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
+import Snackbar from '@material-ui/core/Snackbar';
+import CloseIcon from '@material-ui/icons/Close';
 
 import ImagePreview from './ImagePreview';
 
@@ -43,7 +45,7 @@ export class ImageCard extends Component {
 
     this.state = {
       externalImageSrc: '',
-      shouldReloadImage: true,
+      error: null,
     };
 
     this.canvasRef = React.createRef();
@@ -63,9 +65,13 @@ export class ImageCard extends Component {
   handleFileDownload = async file => {
     const { saveAs } = await import('file-saver');
     const canvas = this.canvasRef.current.getStage().toCanvas();
-    canvas.toBlob(blob => {
-      saveAs(blob, 'pretty image.png');
-    });
+    try {
+      canvas.toBlob(blob => {
+        saveAs(blob, 'pretty image.png');
+      });
+    } catch (error) {
+      this.setState({ error });
+    }
   };
 
   handleFileCopy = () => {};
@@ -78,80 +84,115 @@ export class ImageCard extends Component {
     this.props.builder.changeImage(this.state.externalImageSrc);
   };
 
+  handleSnackbarClose = () => {
+    this.setState({ error: null });
+  };
+
   render() {
-    const { externalImageSrc } = this.state;
+    const { externalImageSrc, error } = this.state;
 
     return (
-      <Card>
-        <CardHeader title="图片预览" />
-        <CenteredCardContent>
-          <ImagePreview forwardRef={this.canvasRef} />
-        </CenteredCardContent>
-        <CardActions>
-          <input
-            onChange={this.handleFileUpload}
-            accept="image/*"
-            style={{ display: 'none' }}
-            id="upload-image"
-            type="file"
-          />
-          <label htmlFor="upload-image">
-            <Button component="span" color="primary">
-              Upload
-              <CloudUploadIcon style={rightIconStyle} />
-            </Button>
-          </label>
-          <Button color="secondary" onClick={this.handleFileDownload}>
-            Save
-            <SaveIcon style={rightIconStyle} />
-          </Button>
-          <Fragment>
-            <Tooltip disableTouchListener title="Not supported yet!">
-              <Button color="default" onClick={this.handleFileCopy}>
-                Copy
-                <FileCopyIcon style={rightIconStyle} />
+      <Fragment>
+        <Card>
+          <CardHeader title="图片预览" />
+          <CenteredCardContent>
+            <ImagePreview forwardRef={this.canvasRef} />
+          </CenteredCardContent>
+          <CardActions>
+            <input
+              onChange={this.handleFileUpload}
+              accept="image/*"
+              style={{ display: 'none' }}
+              id="upload-image"
+              type="file"
+            />
+            <label htmlFor="upload-image">
+              <Button component="span" color="primary">
+                Upload
+                <CloudUploadIcon style={rightIconStyle} />
               </Button>
-            </Tooltip>
-          </Fragment>
-        </CardActions>
-        <CardContent>
-          <Typography component="p" color="textSecondary" gutterBottom>
-            Image might overflow with insufficient space, click Save button to preview whole
-          </Typography>
-          <Typography component="p" color="textSecondary">
-            Failed to find a clipboard api to programmatically copy canvas/image, right click and
-            select 'Copy image' works though
-          </Typography>
-        </CardContent>
+            </label>
+            <Button color="secondary" onClick={this.handleFileDownload}>
+              Save
+              <SaveIcon style={rightIconStyle} />
+            </Button>
+            <Fragment>
+              <Tooltip disableTouchListener title="Not supported yet!">
+                <Button color="default" onClick={this.handleFileCopy}>
+                  Copy
+                  <FileCopyIcon style={rightIconStyle} />
+                </Button>
+              </Tooltip>
+            </Fragment>
+          </CardActions>
+          <CardContent>
+            <Typography component="p" color="textSecondary" gutterBottom>
+              Image might overflow with insufficient space, click Save button to preview whole
+            </Typography>
+            <Typography component="p" color="textSecondary">
+              Failed to find a clipboard api to programmatically copy canvas/image, right click and
+              select 'Copy image' works though
+            </Typography>
+          </CardContent>
 
-        <CardContent>
-          <TextField
-            label="External source"
-            value={externalImageSrc}
-            placeholder="Use external image source"
-            helperText={`Enter an valid image source and click 'APPLY'`}
-            fullWidth
-            margin="normal"
-            onChange={this.handleExternalImageSrcChange}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Tooltip disableTouchListener title="Apply">
-                    <div>
-                      <IconButton
-                        disabled={!externalImageSrc}
-                        onClick={this.handleExternalImageLoad}
-                      >
-                        <SendIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </CardContent>
-      </Card>
+          <CardContent>
+            <TextField
+              label="External source"
+              value={externalImageSrc}
+              placeholder="Use external image source"
+              helperText={`Enter an valid image source and click 'APPLY'`}
+              fullWidth
+              margin="normal"
+              onChange={this.handleExternalImageSrcChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Tooltip disableTouchListener title="Apply">
+                      <div>
+                        <IconButton
+                          disabled={!externalImageSrc}
+                          onClick={this.handleExternalImageLoad}
+                        >
+                          <SendIcon />
+                        </IconButton>
+                      </div>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          open={!!error}
+          autoHideDuration={3000}
+          onClose={this.handleSnackbarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={
+            <span id="message-id">
+              External image may not be download this way. Right click and select 'Copy image'
+              instead
+            </span>
+          }
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              onClick={this.handleSnackbarClose}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
+      </Fragment>
     );
   }
 }
