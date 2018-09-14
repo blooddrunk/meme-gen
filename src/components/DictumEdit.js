@@ -76,6 +76,7 @@ export class DictumEdit extends Component {
             <CachedIcon style={rightIconStyle} />
           </Button>
         </CardActions>
+
         <CardContent>
           <FormControlLabel
             control={

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { autorun, reaction } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import { Stage, Layer, Image, Text } from 'react-konva';
+import Button from '@material-ui/core/Button';
+import Snackbar from '@material-ui/core/Snackbar';
 import memoize from 'memoize-one';
 
 @inject(({ store }) => ({
@@ -27,6 +29,7 @@ class ImagePreview extends Component {
 
     this.state = {
       image: null,
+      error: null,
     };
 
     this.authorTextRef = React.createRef();
@@ -56,7 +59,19 @@ class ImagePreview extends Component {
     }
   };
 
+  handleImageReload = () => {
+    this._createImage(this.props.builder.imageSrc);
+  };
+
+  handleSnackbarClose = () => {
+    this.setState({ error: null });
+  };
+
   _createImage(src) {
+    if (!src) {
+      return;
+    }
+
     const { builder } = this.props;
     builder.toggleLoading(true);
 
@@ -69,8 +84,11 @@ class ImagePreview extends Component {
         image,
       });
     };
-    image.onerror = () => {
+    image.onerror = error => {
       builder.toggleLoading(false);
+      builder.changeImage('');
+
+      this.setState({ error });
     };
   }
 
@@ -114,44 +132,69 @@ class ImagePreview extends Component {
   };
 
   render() {
-    const { builder, containerWidth, containerHeight, forwardRef } = this.props;
-    const { image } = this.state;
+    const {
+      builder: { dictum, author },
+      containerWidth,
+      containerHeight,
+      forwardRef,
+    } = this.props;
+    const { image, error } = this.state;
     const scale = this._computeScale(containerWidth, containerHeight, image);
     const { width, height } = this._computeSize(image, scale, containerWidth, containerWidth);
 
     return (
-      <Stage ref={forwardRef} width={width} height={height}>
-        <Layer>
-          <Image image={image} preventDefault={false} scale={{ x: scale, y: scale }} />
-          {image && (
-            <Fragment>
-              <Text
-                ref={this.dictumTextRef}
-                width={width}
-                y={height}
-                fill="white"
-                text={builder.dictum}
-                fontSize={36}
-                align="center"
-                verticalAlign="bottom"
-                preventDefault={false}
-              />
-              <Text
-                ref={this.authorTextRef}
-                width={width}
-                y={height}
-                fill="white"
-                text={builder.author && `——${builder.author}`}
-                padding={16}
-                fontSize={30}
-                align="right"
-                verticalAlign="bottom"
-                preventDefault={false}
-              />
-            </Fragment>
-          )}
-        </Layer>
-      </Stage>
+      <Fragment>
+        <Stage ref={forwardRef} width={width} height={height}>
+          <Layer>
+            <Image image={image} preventDefault={false} scale={{ x: scale, y: scale }} />
+            {image && (
+              <Fragment>
+                <Text
+                  ref={this.dictumTextRef}
+                  width={width}
+                  y={height}
+                  fill="white"
+                  text={dictum}
+                  fontSize={36}
+                  align="center"
+                  verticalAlign="bottom"
+                  preventDefault={false}
+                />
+                <Text
+                  ref={this.authorTextRef}
+                  width={width}
+                  y={height}
+                  fill="white"
+                  text={author && `——${author}`}
+                  padding={16}
+                  fontSize={30}
+                  align="right"
+                  verticalAlign="bottom"
+                  preventDefault={false}
+                />
+              </Fragment>
+            )}
+          </Layer>
+        </Stage>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          open={!!error}
+          autoHideDuration={3000}
+          onClose={this.handleSnackbarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">Failed to loading image, please check the URL</span>}
+          action={[
+            <Button key="reload" color="secondary" size="small" onClick={this.handleImageReload}>
+              RETRY
+            </Button>,
+          ]}
+        />
+      </Fragment>
     );
   }
 }

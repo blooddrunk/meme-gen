@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { inject } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Card from '@material-ui/core/Card';
@@ -12,6 +12,10 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SaveIcon from '@material-ui/icons/Save';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import Tooltip from '@material-ui/core/Tooltip';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import IconButton from '@material-ui/core/IconButton';
+import SendIcon from '@material-ui/icons/Send';
 
 import ImagePreview from './ImagePreview';
 
@@ -28,6 +32,7 @@ const rightIconStyle = {
 @inject(({ store }) => ({
   builder: store.builder,
 }))
+@observer
 export class ImageCard extends Component {
   static propTypes = {
     builder: PropTypes.object.isRequired,
@@ -35,6 +40,11 @@ export class ImageCard extends Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      externalImageSrc: '',
+      shouldReloadImage: true,
+    };
 
     this.canvasRef = React.createRef();
   }
@@ -60,7 +70,17 @@ export class ImageCard extends Component {
 
   handleFileCopy = () => {};
 
+  handleExternalImageSrcChange = ({ target }) => {
+    this.setState({ externalImageSrc: target.value });
+  };
+
+  handleExternalImageLoad = () => {
+    this.props.builder.changeImage(this.state.externalImageSrc);
+  };
+
   render() {
+    const { externalImageSrc } = this.state;
+
     return (
       <Card>
         <CardHeader title="图片预览" />
@@ -102,6 +122,34 @@ export class ImageCard extends Component {
             Failed to find a clipboard api to programmatically copy canvas/image, right click and
             select 'Copy image' works though
           </Typography>
+        </CardContent>
+
+        <CardContent>
+          <TextField
+            label="External source"
+            value={externalImageSrc}
+            placeholder="Use external image source"
+            helperText={`Enter an valid image source and click 'APPLY'`}
+            fullWidth
+            margin="normal"
+            onChange={this.handleExternalImageSrcChange}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Tooltip disableTouchListener title="Apply">
+                    <div>
+                      <IconButton
+                        disabled={!externalImageSrc}
+                        onClick={this.handleExternalImageLoad}
+                      >
+                        <SendIcon />
+                      </IconButton>
+                    </div>
+                  </Tooltip>
+                </InputAdornment>
+              ),
+            }}
+          />
         </CardContent>
       </Card>
     );
