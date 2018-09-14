@@ -14,7 +14,6 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import ImagePreview from './ImagePreview';
-import defaultImage from '../assets/images/luxun_1.jpg';
 
 const CenteredCardContent = styled(CardContent)`
   display: flex;
@@ -32,8 +31,6 @@ const rightIconStyle = {
 export class ImageCard extends Component {
   static propTypes = {
     builder: PropTypes.object.isRequired,
-    dictum: PropTypes.string.isRequired,
-    author: PropTypes.string,
   };
 
   constructor(props) {
@@ -42,20 +39,11 @@ export class ImageCard extends Component {
     this.canvasRef = React.createRef();
   }
 
-  state = {
-    uploadedImage: null,
-  };
-
-  componentDidMount = () => {
-    this._createImage(defaultImage);
-  };
-
   handleFileUpload = ({ target }) => {
     const file = target.files[0];
     if (file) {
       const fileReader = new FileReader();
       fileReader.addEventListener('load', () => {
-        this._createImage(fileReader.result);
         this.props.builder.changeImage(fileReader.result);
       });
       fileReader.readAsDataURL(file);
@@ -72,30 +60,12 @@ export class ImageCard extends Component {
 
   handleFileCopy = () => {};
 
-  _createImage(src) {
-    const image = new Image();
-    image.src = src;
-    image.onload = () => {
-      this.setState({
-        uploadedImage: image,
-      });
-    };
-  }
-
   render() {
-    const { dictum, author } = this.props;
-    const { uploadedImage } = this.state;
-
     return (
       <Card>
         <CardHeader title="图片预览" />
         <CenteredCardContent>
-          <ImagePreview
-            forwardRef={this.canvasRef}
-            image={uploadedImage}
-            dictum={dictum}
-            author={author}
-          />
+          <ImagePreview forwardRef={this.canvasRef} />
         </CenteredCardContent>
         <CardActions>
           <input

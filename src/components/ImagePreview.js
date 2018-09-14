@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { reaction } from 'mobx';
+import { autorun, reaction } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import { Stage, Layer, Image, Text } from 'react-konva';
 import memoize from 'memoize-one';
@@ -31,42 +31,62 @@ class ImagePreview extends Component {
 
     this.authorTextRef = React.createRef();
     this.dictumTextRef = React.createRef();
-
-    reaction(
-      () => props.builder.imageSrc,
-      () => {
-        this._createImage(props.builder.imageSrc);
-      },
-      {
-        fireImmediately: true,
-      }
-    );
   }
 
-  componentDidUpdate = ({ image, dictum, author }) => {
-    if (
-      image !== this.props.image ||
-      dictum !== this.props.dictum ||
-      author !== this.props.author
-    ) {
-      const stage = this.props.forwardRef.current.getStage();
-      const authorText = this.authorTextRef.current;
-      const dictumText = this.dictumTextRef.current;
+  componentDidMount = () => {
+    autorun(() => {
+      this._createImage(this.props.builder.imageSrc);
+    });
 
-      const authorTextY = stage.getHeight() - authorText.getHeight();
-      authorText.y(authorTextY);
-      dictumText.y(authorTextY - dictumText.getHeight());
+    reaction(
+      () => ({
+        dictum: this.props.builder.dictum,
+        author: this.props.builder.author,
+      }),
+      props => {
+        this.shouldAdjustText = true;
+      }
+    );
+  };
+
+  componentDidUpdate = (prevProps, { image }) => {
+    if (image !== this.state.image || this.shouldAdjustText) {
+      this._adjustText();
+      this.shouldAdjustText = false;
     }
   };
 
   _createImage(src) {
+    const { builder } = this.props;
+    builder.toggleLoading(true);
+
     const image = new window.Image();
     image.src = src;
     image.onload = () => {
+      builder.toggleLoading(false);
+
       this.setState({
         image,
       });
     };
+    image.onerror = () => {
+      builder.toggleLoading(false);
+    };
+  }
+
+  _adjustText() {
+    const stageRef = this.props.forwardRef.current;
+    const authorText = this.authorTextRef.current;
+    const dictumText = this.dictumTextRef.current;
+
+    if (!stageRef || !authorText || !dictumText) {
+      return;
+    }
+
+    const stage = stageRef.getStage();
+    const authorTextY = stage.getHeight() - authorText.getHeight();
+    authorText.y(authorTextY);
+    dictumText.y(authorTextY - dictumText.getHeight());
   }
 
   _computeScale = memoize((containerWidth, containerHeight, image) => {
@@ -94,7 +114,7 @@ class ImagePreview extends Component {
   };
 
   render() {
-    const { dictum, author, containerWidth, containerHeight, forwardRef } = this.props;
+    const { builder, containerWidth, containerHeight, forwardRef } = this.props;
     const { image } = this.state;
     const scale = this._computeScale(containerWidth, containerHeight, image);
     const { width, height } = this._computeSize(image, scale, containerWidth, containerWidth);
@@ -110,7 +130,7 @@ class ImagePreview extends Component {
                 width={width}
                 y={height}
                 fill="white"
-                text={dictum}
+                text={builder.dictum}
                 fontSize={36}
                 align="center"
                 verticalAlign="bottom"
@@ -121,7 +141,7 @@ class ImagePreview extends Component {
                 width={width}
                 y={height}
                 fill="white"
-                text={author && `——${author}`}
+                text={builder.author && `——${builder.author}`}
                 padding={16}
                 fontSize={30}
                 align="right"

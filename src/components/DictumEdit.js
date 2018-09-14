@@ -11,6 +11,7 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Button from '@material-ui/core/Button';
 import CachedIcon from '@material-ui/icons/Cached';
+import RestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 import Collapse from '@material-ui/core/Collapse';
 
 const rightIconStyle = {
@@ -44,7 +45,7 @@ export class DictumEdit extends Component {
 
   render() {
     const {
-      builder: { dictum, author, authorVisible, multiline, drawDictum },
+      builder: { dictum, author, authorVisible, multiline, drawDictum, reset },
     } = this.props;
 
     return (
@@ -68,6 +69,14 @@ export class DictumEdit extends Component {
               ),
             }}
           />
+        </CardContent>
+        <CardActions>
+          <Button color="default" onClick={drawDictum}>
+            RANDOM
+            <CachedIcon style={rightIconStyle} />
+          </Button>
+        </CardActions>
+        <CardContent>
           <FormControlLabel
             control={
               <Switch color="primary" checked={authorVisible} onChange={this.handleAuthorToggle} />
@@ -86,9 +95,9 @@ export class DictumEdit extends Component {
           </Collapse>
         </CardContent>
         <CardActions>
-          <Button color="default" onClick={drawDictum}>
-            RANDOM
-            <CachedIcon style={rightIconStyle} />
+          <Button color="default" onClick={reset}>
+            RESET
+            <RestoreIcon style={rightIconStyle} />
           </Button>
         </CardActions>
       </Card>

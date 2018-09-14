@@ -8,6 +8,7 @@ export const Builder = types
     dictum: randomDictum(),
     author: '鲁迅',
     imageSrc: defaultImageSrc,
+    imageLoading: false,
     multiline: false,
   })
   .views(self => ({
@@ -28,11 +29,21 @@ export const Builder = types
       self.author = author;
     },
 
-    changeImage(imageSrc) {
-      self.imageSrc = imageSrc;
+    changeImage(src) {
+      self.imageSrc = src;
+    },
+
+    toggleLoading(loading) {
+      self.imageLoading = loading;
     },
 
     toggleMultiline(multiline) {
       self.multiline = multiline;
+    },
+
+    reset() {
+      self.imageSrc = defaultImageSrc;
+      self.dictum = randomDictum();
+      self.author = '鲁迅';
     },
   }));
