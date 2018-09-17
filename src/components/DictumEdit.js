@@ -92,6 +92,18 @@ export class DictumEdit extends Component {
             triangle="hide"
             width="280px"
             color={textColor}
+            colors={[
+              '#000',
+              '#f3f3f3',
+              '#f44336',
+              '#9c27b0',
+              '#673ab7',
+              '#3f51b5',
+              '#03a9f4',
+              '#009688',
+              '#ffc107',
+              '#cddc39',
+            ]}
             onChangeComplete={this.handleColorChange}
           />
         </CardContent>
