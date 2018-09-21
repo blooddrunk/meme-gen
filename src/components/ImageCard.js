@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -39,13 +40,11 @@ export class ImageCard extends Component {
     builder: PropTypes.object.isRequired,
   };
 
+  @observable
+  error = null;
+
   constructor(props) {
     super(props);
-
-    this.state = {
-      externalImageSrc: '',
-      error: null,
-    };
 
     this.canvasRef = React.createRef();
   }
@@ -69,26 +68,33 @@ export class ImageCard extends Component {
         saveAs(blob, 'pretty image.png');
       });
     } catch (error) {
-      this.setState({ error });
+      this.error = error;
     }
   };
 
   handleFileCopy = () => {};
 
   handleExternalImageSrcChange = ({ target }) => {
-    this.setState({ externalImageSrc: target.value });
+    this.props.builder.changeExternalImage(target.value);
   };
 
   handleExternalImageLoad = () => {
-    this.props.builder.changeImage(this.state.externalImageSrc);
+    const { builder } = this.props;
+    builder.changeImage(builder.externalImageSrc);
   };
 
   handleSnackbarClose = () => {
-    this.setState({ error: null });
+    this.error = null;
+  };
+
+  handleExternalImagePick = () => {
+    this.props.builder.pickExternalImage();
   };
 
   render() {
-    const { externalImageSrc, error } = this.state;
+    const {
+      builder: { externalImageSrc, externalImageFetching },
+    } = this.props;
 
     return (
       <Fragment>
@@ -141,6 +147,7 @@ export class ImageCard extends Component {
               placeholder="Use external image source"
               helperText={`Enter an valid image source and click 'APPLY'`}
               fullWidth
+              disabled={externalImageFetching}
               margin="normal"
               onChange={this.handleExternalImageSrcChange}
               InputProps={{
@@ -161,6 +168,9 @@ export class ImageCard extends Component {
               }}
             />
           </CardContent>
+          <CardActions>
+            <Button onClick={this.handleExternalImagePick}>I'm Feeling Lucky</Button>
+          </CardActions>
         </Card>
 
         <Snackbar
@@ -168,7 +178,7 @@ export class ImageCard extends Component {
             vertical: 'bottom',
             horizontal: 'center',
           }}
-          open={!!error}
+          open={!!this.error}
           autoHideDuration={3000}
           onClose={this.handleSnackbarClose}
           ContentProps={{

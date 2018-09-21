@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types, flow } from 'mobx-state-tree';
 
 import defaultImageSrc from '../assets/images/luxun_1.jpg';
 import { randomDictum } from './helpers';
@@ -9,6 +9,8 @@ export const Builder = types
     author: '鲁迅',
     imageSrc: defaultImageSrc,
     imageLoading: false,
+    externalImageSrc: '',
+    externalImageFetching: false,
     multiline: false,
     textColor: '#FFF',
   })
@@ -17,39 +19,70 @@ export const Builder = types
       return !!self.author;
     },
   }))
-  .actions(self => ({
-    changeDictum(dictum) {
-      self.dictum = dictum;
-    },
+  .actions(self => {
+    let controller = new window.AbortController();
+    let { signal } = controller;
 
-    drawDictum() {
-      self.dictum = randomDictum();
-    },
+    return {
+      changeDictum(dictum) {
+        self.dictum = dictum;
+      },
 
-    changeAuthor(author) {
-      self.author = author;
-    },
+      drawDictum() {
+        self.dictum = randomDictum();
+      },
 
-    changeImage(src) {
-      self.imageSrc = src;
-    },
+      changeAuthor(author) {
+        self.author = author;
+      },
 
-    changeTextColor(color) {
-      self.textColor = color;
-    },
+      changeImage(src) {
+        self.imageSrc = src;
+      },
 
-    toggleLoading(loading) {
-      self.imageLoading = loading;
-    },
+      changeExternalImage(src) {
+        self.externalImageSrc = src;
+      },
 
-    toggleMultiline(multiline) {
-      self.multiline = multiline;
-    },
+      changeTextColor(color) {
+        self.textColor = color;
+      },
 
-    reset() {
-      self.imageSrc = defaultImageSrc;
-      self.dictum = randomDictum();
-      self.author = '鲁迅';
-      self.textColor = '#FFF';
-    },
-  }));
+      toggleLoading(loading) {
+        self.imageLoading = loading;
+      },
+
+      toggleMultiline(multiline) {
+        self.multiline = multiline;
+      },
+
+      reset() {
+        self.imageSrc = defaultImageSrc;
+        self.dictum = randomDictum();
+        self.author = '鲁迅';
+        self.textColor = '#FFF';
+      },
+
+      pickExternalImage: flow(function* pickExternalImage() {
+        if (self.externalImageFetching) {
+          controller.abort();
+          controller = new window.AbortController();
+          signal = controller.signal;
+        } else {
+          self.externalImageFetching = true;
+        }
+
+        try {
+          const response = yield fetch('http://www.splashbase.co/api/v1/images/random', { signal });
+          const { url } = yield response.json();
+          self.externalImageSrc = url;
+          self.imageSrc = url;
+        } catch (error) {
+          // TODO haven't decided what to do yet
+          console.error(error);
+        } finally {
+          self.externalImageFetching = false;
+        }
+      }),
+    };
+  });
