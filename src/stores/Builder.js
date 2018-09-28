@@ -73,7 +73,9 @@ export const Builder = types
         }
 
         try {
-          const response = yield fetch('http://www.splashbase.co/api/v1/images/random', { signal });
+          const response = yield fetch('https://www.splashbase.co/api/v1/images/random', {
+            signal,
+          });
           const { url } = yield response.json();
           self.externalImageSrc = url;
           self.imageSrc = url;
