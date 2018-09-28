@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import { observable } from 'mobx';
 import styled from 'styled-components';
+import { withTheme } from '@material-ui/core/styles';
+import SnackbarContent from '@material-ui/core/SnackbarContent';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 import ImageCard from '../components/ImageCard';
 import DictumEdit from '../components/DictumEdit';
@@ -19,10 +25,48 @@ const Container = styled.section`
   }
 `;
 
+const Alert = styled(SnackbarContent)`
+  grid-column: 1 / span 2;
+  width: 100%;
+  max-width: 100%;
+  background-color: ${props => props.theme.palette.error.light};
+
+  @supports (display: grid) {
+    display: none;
+  }
+`;
+
+@withTheme()
+@observer
 export default class Home extends Component {
+  @observable
+  isAlertVisible = true;
+
+  handleAlertClose = () => {
+    this.isAlertVisible = false;
+  };
+
   render() {
+    const { theme } = this.props;
+
     return (
       <Container>
+        {this.isAlertVisible && (
+          <Alert
+            message="Your browser seems to be out of date so that it lacks support of CSS Grid Layout."
+            theme={theme}
+            action={[
+              <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                onClick={this.handleAlertClose}
+              >
+                <CloseIcon />
+              </IconButton>,
+            ]}
+          />
+        )}
         <ImageCard />
         <DictumEdit />
       </Container>
