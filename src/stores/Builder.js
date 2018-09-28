@@ -73,12 +73,19 @@ export const Builder = types
         }
 
         try {
-          const response = yield fetch('https://www.splashbase.co/api/v1/images/random', {
-            signal,
-          });
-          const { url } = yield response.json();
-          self.externalImageSrc = url;
-          self.imageSrc = url;
+          const response = yield fetch(
+            `https://api.unsplash.com/photos/random/?client_id=${
+              process.env.REACT_APP_UNSPLASH_ACCESS_KEY
+            }`,
+            {
+              signal,
+            }
+          );
+          const {
+            urls: { regular },
+          } = yield response.json();
+          self.externalImageSrc = regular;
+          self.imageSrc = regular;
         } catch (error) {
           // TODO haven't decided what to do yet
           console.error(error);
