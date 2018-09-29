@@ -61,11 +61,11 @@ export class ImageCard extends Component {
   };
 
   handleFileDownload = async file => {
-    const { saveAs } = await import('file-saver');
+    const fileSaver = (await import('file-saver')).default;
     const canvas = this.canvasRef.current.getStage().toCanvas();
     try {
       canvas.toBlob(blob => {
-        saveAs(blob, 'pretty image.png');
+        fileSaver(blob, 'pretty image.png');
       });
     } catch (error) {
       this.error = error;
@@ -131,13 +131,25 @@ export class ImageCard extends Component {
             </Fragment>
           </CardActions>
           <CardContent>
-            <Typography component="p" color="textSecondary" gutterBottom>
-              Image might overflow with insufficient space, click Save button to preview whole
-            </Typography>
-            <Typography component="p" color="textSecondary">
-              Failed to find a clipboard api to programmatically copy canvas/image, right click and
-              select 'Copy image' works though
-            </Typography>
+            <ul>
+              <li>
+                <Typography color="textSecondary" gutterBottom>
+                  Text supports drag & drop
+                </Typography>
+              </li>
+
+              <li>
+                <Typography color="textSecondary" gutterBottom>
+                  Image might overflow with insufficient space, click Save button to preview whole
+                </Typography>
+              </li>
+              <li>
+                <Typography color="textSecondary">
+                  Failed to find a clipboard api to programmatically copy canvas/image, right click
+                  and select 'Copy image' works though
+                </Typography>
+              </li>
+            </ul>
           </CardContent>
 
           <CardContent>

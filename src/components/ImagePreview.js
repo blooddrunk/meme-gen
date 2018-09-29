@@ -153,6 +153,7 @@ class ImagePreview extends Component {
                 <Text
                   ref={this.dictumTextRef}
                   width={width}
+                  x={0}
                   y={height}
                   fill={textColor}
                   text={dictum}
@@ -160,10 +161,12 @@ class ImagePreview extends Component {
                   align="center"
                   verticalAlign="bottom"
                   preventDefault={false}
+                  draggable
                 />
                 <Text
                   ref={this.authorTextRef}
                   width={width}
+                  x={0}
                   y={height}
                   fill={textColor}
                   text={author && `——${author}`}
@@ -172,6 +175,7 @@ class ImagePreview extends Component {
                   align="right"
                   verticalAlign="bottom"
                   preventDefault={false}
+                  draggable
                 />
               </Fragment>
             )}
