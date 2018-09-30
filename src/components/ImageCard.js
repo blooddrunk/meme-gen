@@ -137,7 +137,6 @@ export class ImageCard extends Component {
                   Text supports drag & drop
                 </Typography>
               </li>
-
               <li>
                 <Typography color="textSecondary" gutterBottom>
                   Image might overflow with insufficient space, click Save button to preview whole

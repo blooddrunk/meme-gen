@@ -11,3 +11,4 @@
 - [ ] Image loading indicator
 - [ ] Image gallery
 - [ ] Use `formik` together with `mobx` to maintain form state
+- [ ] i18n
