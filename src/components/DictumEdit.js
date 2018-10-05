@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { inject, observer } from 'mobx-react';
+import compose from 'recompose/compose';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -20,11 +21,7 @@ const rightIconStyle = {
   marginLeft: 8,
 };
 
-@inject(({ store }) => ({
-  builder: store.builder,
-}))
-@observer
-export class DictumEdit extends Component {
+class DictumEdit extends Component {
   static propTypes = {
     builder: PropTypes.object.isRequired,
   };
@@ -137,4 +134,10 @@ export class DictumEdit extends Component {
   }
 }
 
-export default DictumEdit;
+const enhance = compose(
+  observer,
+  inject(({ store }) => ({
+    builder: store.builder,
+  }))
+);
+export default enhance(DictumEdit);

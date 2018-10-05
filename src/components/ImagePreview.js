@@ -2,15 +2,12 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { autorun, reaction } from 'mobx';
 import { inject, observer } from 'mobx-react';
+import compose from 'recompose/compose';
 import { Stage, Layer, Image, Text } from 'react-konva';
 import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import memoize from 'memoize-one';
 
-@inject(({ store }) => ({
-  builder: store.builder,
-}))
-@observer
 class ImagePreview extends Component {
   static propTypes = {
     image: PropTypes.object,
@@ -204,4 +201,10 @@ class ImagePreview extends Component {
   }
 }
 
-export default ImagePreview;
+const enhance = compose(
+  inject(({ store }) => ({
+    builder: store.builder,
+  })),
+  observer
+);
+export default enhance(ImagePreview);

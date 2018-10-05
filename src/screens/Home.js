@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { observable } from 'mobx';
+import { decorate, observable } from 'mobx';
+import compose from 'recompose/compose';
 import styled from 'styled-components';
 import { withTheme } from '@material-ui/core/styles';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
@@ -36,10 +37,7 @@ const Alert = styled(SnackbarContent)`
   }
 `;
 
-@withTheme()
-@observer
-export default class Home extends Component {
-  @observable
+class Home extends Component {
   isAlertVisible = true;
 
   handleAlertClose = () => {
@@ -73,3 +71,12 @@ export default class Home extends Component {
     );
   }
 }
+
+decorate(Home, {
+  isAlertVisible: observable,
+});
+const enhance = compose(
+  observer,
+  withTheme()
+);
+export default enhance(Home);

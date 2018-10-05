@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import DefaultLayout from '../layouts/Default';
 import Home from './Home';
 
+console.log(Home);
 class Root extends Component {
   render() {
     return (

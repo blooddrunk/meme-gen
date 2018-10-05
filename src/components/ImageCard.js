@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
-import { observable } from 'mobx';
+import { decorate, observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
+import compose from 'recompose/compose';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Card from '@material-ui/core/Card';
@@ -30,17 +31,11 @@ const CenteredCardContent = styled(CardContent)`
 const rightIconStyle = {
   marginLeft: 8,
 };
-
-@inject(({ store }) => ({
-  builder: store.builder,
-}))
-@observer
-export class ImageCard extends Component {
+class ImageCard extends Component {
   static propTypes = {
     builder: PropTypes.object.isRequired,
   };
 
-  @observable
   error = null;
 
   constructor(props) {
@@ -212,4 +207,13 @@ export class ImageCard extends Component {
   }
 }
 
-export default ImageCard;
+decorate(ImageCard, {
+  error: observable,
+});
+const enhance = compose(
+  observer,
+  inject(({ store }) => ({
+    builder: store.builder,
+  }))
+);
+export default enhance(ImageCard);
