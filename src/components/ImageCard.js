@@ -211,9 +211,9 @@ decorate(ImageCard, {
   error: observable,
 });
 const enhance = compose(
-  observer,
   inject(({ store }) => ({
     builder: store.builder,
-  }))
+  })),
+  observer
 );
 export default enhance(ImageCard);

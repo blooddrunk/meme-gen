@@ -135,9 +135,9 @@ class DictumEdit extends Component {
 }
 
 const enhance = compose(
-  observer,
   inject(({ store }) => ({
     builder: store.builder,
-  }))
+  })),
+  observer
 );
 export default enhance(DictumEdit);

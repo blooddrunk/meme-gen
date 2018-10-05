@@ -76,7 +76,7 @@ decorate(Home, {
   isAlertVisible: observable,
 });
 const enhance = compose(
-  observer,
-  withTheme()
+  withTheme(),
+  observer
 );
 export default enhance(Home);
