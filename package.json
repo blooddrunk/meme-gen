@@ -29,7 +29,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "rm -rf docs&&cp -R build docs",
-    "postdeploy": "git commit -am \"publish to Github Pages\"&&git push",
+    "postdeploy": "git add .&&git commit -m \"publish to Github Pages\"&&git push",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,scss,css,json,md}\""
   },
   "devDependencies": {
