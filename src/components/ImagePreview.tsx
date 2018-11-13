@@ -5,28 +5,24 @@ import * as ReactKonva from 'react-konva';
 import * as Konva from 'konva';
 import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
+import ReactResizeDetector from 'react-resize-detector';
 
 import { StoreContext, RootStoreType } from '../stores';
 
 export interface ImagePreviewProps {
   innerRef: (el: ReactKonva.Stage) => void;
-  containerHeight: number;
-  containerWidth: number;
 }
 export interface ImagePreviewState {
   image: HTMLImageElement | null;
   error: Error | null;
+  stageWidth: number;
+  stageHeight: number;
 }
 
 @observer
 export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState> {
   static contextType = StoreContext;
   context!: RootStoreType;
-
-  static defaultProps: Partial<ImagePreviewProps> = {
-    containerWidth: 600,
-    containerHeight: 600,
-  };
 
   authorTextRef = React.createRef<Konva.Text>();
   dictumTextRef = React.createRef<Konva.Text>();
@@ -42,6 +38,8 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
   state: ImagePreviewState = {
     image: null,
     error: null,
+    stageWidth: 600,
+    stageHeight: 600,
   };
 
   componentDidMount = () => {
@@ -54,6 +52,7 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
         dictum: this.context.builder.dictum,
         author: this.context.builder.author,
         textColor: this.context.builder.textColor,
+        stageWidth: this.state.stageWidth,
       }),
       () => {
         this.shouldAdjustText = true;
@@ -61,8 +60,8 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
     );
   };
 
-  componentDidUpdate = (prevProps: ImagePreviewProps, { image }: ImagePreviewState) => {
-    if (image !== this.state.image || this.shouldAdjustText) {
+  componentDidUpdate = (prevProps: ImagePreviewProps, prevState: ImagePreviewState) => {
+    if (this.state.image !== prevState.image || this.shouldAdjustText) {
       this._adjustText();
       this.shouldAdjustText = false;
     }
@@ -70,6 +69,10 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
 
   handleImageReload = () => {
     this._createImage(this.context.builder.imageSrc);
+  };
+
+  handleResize = (width: number) => {
+    this.setState({ stageWidth: width });
   };
 
   handleSnackbarClose = () => {
@@ -153,13 +156,14 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
     const {
       builder: { dictum, author, textColor },
     } = this.context;
-    const { innerRef, containerWidth, containerHeight } = this.props;
-    const { image, error } = this.state;
-    const scale = this._computeScale(containerWidth, containerHeight, image);
-    const { width, height } = this._computeSize(image, scale, containerWidth, containerWidth);
+    const { image, error, stageWidth, stageHeight } = this.state;
+
+    // TODO meoization
+    const scale = this._computeScale(stageWidth, stageHeight, image);
+    const { width, height } = this._computeSize(image, scale, stageWidth, stageHeight);
 
     return (
-      <Fragment>
+      <div style={{ width: '100%' }}>
         <ReactKonva.Stage ref={this.setStageRef} width={width} height={height}>
           <ReactKonva.Layer>
             {image && (
@@ -176,7 +180,7 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
                   y={height}
                   fill={textColor}
                   text={dictum}
-                  fontSize={36}
+                  fontSize={48 * scale}
                   align="center"
                   verticalAlign="bottom"
                   preventDefault={false}
@@ -190,7 +194,7 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
                   fill={textColor}
                   text={author && `——${author}`}
                   padding={16}
-                  fontSize={30}
+                  fontSize={36 * scale}
                   align="right"
                   verticalAlign="bottom"
                   preventDefault={false}
@@ -200,6 +204,7 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
             )}
           </ReactKonva.Layer>
         </ReactKonva.Stage>
+
         <Snackbar
           anchorOrigin={{
             vertical: 'bottom',
@@ -218,7 +223,9 @@ export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState
             </Button>,
           ]}
         />
-      </Fragment>
+
+        <ReactResizeDetector handleWidth onResize={this.handleResize} refreshMode="throttle" />
+      </div>
     );
   }
 }

@@ -16,3 +16,4 @@
 - [ ] hooks😱
 - [ ] `withThemes` doesn't work with `observable` and typescript
 - [ ] `@material-ui/styles`🙀
+- [x] adjust text size automatically
