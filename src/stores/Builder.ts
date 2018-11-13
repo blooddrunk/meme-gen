@@ -24,7 +24,7 @@ export const Builder = types
     let { signal } = controller;
 
     return {
-      changeDictum(dictum) {
+      changeDictum(dictum: string) {
         self.dictum = dictum;
       },
 
@@ -32,27 +32,27 @@ export const Builder = types
         self.dictum = randomDictum();
       },
 
-      changeAuthor(author) {
+      changeAuthor(author: string) {
         self.author = author;
       },
 
-      changeImage(src) {
+      changeImage(src: string) {
         self.imageSrc = src;
       },
 
-      changeExternalImage(src) {
+      changeExternalImage(src: string) {
         self.externalImageSrc = src;
       },
 
-      changeTextColor(color) {
+      changeTextColor(color: string) {
         self.textColor = color;
       },
 
-      toggleLoading(loading) {
+      toggleLoading(loading: boolean) {
         self.imageLoading = loading;
       },
 
-      toggleMultiline(multiline) {
+      toggleMultiline(multiline: boolean) {
         self.multiline = multiline;
       },
 
@@ -95,3 +95,5 @@ export const Builder = types
       }),
     };
   });
+
+export type BuilderType = typeof Builder;

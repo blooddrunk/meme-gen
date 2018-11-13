@@ -1,9 +1,9 @@
 import React, { Component, Fragment } from 'react';
-import { decorate, observable } from 'mobx';
-import { inject, observer } from 'mobx-react';
-import compose from 'recompose/compose';
-import PropTypes from 'prop-types';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
 import styled from 'styled-components';
+import * as Konva from 'konva';
+import * as ReactKonva from 'react-konva';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -20,7 +20,8 @@ import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
 import Snackbar from '@material-ui/core/Snackbar';
 
-import ImagePreview from './ImagePreview';
+import { StoreContext, RootStoreType } from '../stores';
+import { ImagePreview } from './ImagePreview';
 
 const CenteredCardContent = styled(CardContent)`
   display: flex;
@@ -31,50 +32,52 @@ const CenteredCardContent = styled(CardContent)`
 const rightIconStyle = {
   marginLeft: 8,
 };
-class ImageCard extends Component {
-  static propTypes = {
-    builder: PropTypes.object.isRequired,
-  };
 
-  error = null;
+@observer
+export class ImageCard extends Component {
+  static contextType = StoreContext;
+  context!: RootStoreType;
 
-  constructor(props) {
-    super(props);
+  @observable error = null;
 
-    this.canvasRef = React.createRef();
-  }
+  canvasRef: ReactKonva.Stage | null = null;
 
-  handleFileUpload = ({ target }) => {
-    const file = target.files[0];
+  handleFileUpload = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const file = target.files && target.files[0];
     if (file) {
       const fileReader = new FileReader();
       fileReader.addEventListener('load', () => {
-        this.props.builder.changeImage(fileReader.result);
+        this.context.builder.changeImage(fileReader.result as string);
       });
       fileReader.readAsDataURL(file);
     }
   };
 
-  handleFileDownload = async file => {
-    const fileSaver = (await import('file-saver')).default;
-    const canvas = this.canvasRef.current.getStage().toCanvas();
-    try {
-      canvas.toBlob(blob => {
-        fileSaver(blob, 'pretty image.png');
-      });
-    } catch (error) {
-      this.error = error;
+  handleFileDownload = async () => {
+    const { saveAs } = await import('file-saver');
+    const stage = this.canvasRef;
+    if (stage) {
+      const canvas = stage.getStage().toCanvas({} as Konva.ToCanvasConfig);
+      try {
+        canvas.toBlob(blob => {
+          if (blob) {
+            saveAs(blob, 'pretty image.png');
+          }
+        });
+      } catch (error) {
+        this.error = error;
+      }
     }
   };
 
   handleFileCopy = () => {};
 
-  handleExternalImageSrcChange = ({ target }) => {
-    this.props.builder.changeExternalImage(target.value);
+  handleExternalImageSrcChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    this.context.builder.changeExternalImage(target.value);
   };
 
   handleExternalImageLoad = () => {
-    const { builder } = this.props;
+    const { builder } = this.context;
     builder.changeImage(builder.externalImageSrc);
   };
 
@@ -83,20 +86,20 @@ class ImageCard extends Component {
   };
 
   handleExternalImagePick = () => {
-    this.props.builder.pickExternalImage();
+    this.context.builder.pickExternalImage();
   };
 
   render() {
     const {
       builder: { externalImageSrc, externalImageFetching },
-    } = this.props;
+    } = this.context;
 
     return (
       <Fragment>
         <Card>
           <CardHeader title="图片预览" />
           <CenteredCardContent>
-            <ImagePreview forwardRef={this.canvasRef} />
+            <ImagePreview innerRef={(el: ReactKonva.Stage) => (this.canvasRef = el)} />
           </CenteredCardContent>
           <CardActions>
             <input
@@ -206,14 +209,3 @@ class ImageCard extends Component {
     );
   }
 }
-
-decorate(ImageCard, {
-  error: observable,
-});
-const enhance = compose(
-  inject(({ store }) => ({
-    builder: store.builder,
-  })),
-  observer
-);
-export default enhance(ImageCard);

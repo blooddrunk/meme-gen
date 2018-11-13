@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { inject, observer } from 'mobx-react';
-import compose from 'recompose/compose';
+import { observer } from 'mobx-react';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -15,41 +13,47 @@ import CachedIcon from '@material-ui/icons/Cached';
 import RestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 import Collapse from '@material-ui/core/Collapse';
 import Typography from '@material-ui/core/Typography';
-import { TwitterPicker } from 'react-color';
+import { TwitterPicker, ColorResult } from 'react-color';
+
+import { StoreContext, RootStoreType } from '../stores';
+
+export type DictumEditInjectProps = {
+  store: RootStoreType;
+};
 
 const rightIconStyle = {
   marginLeft: 8,
 };
 
-class DictumEdit extends Component {
-  static propTypes = {
-    builder: PropTypes.object.isRequired,
+@observer
+export class DictumEdit extends Component {
+  static contextType = StoreContext;
+  context!: RootStoreType;
+
+  handleMultilineToggle = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    this.context.builder.toggleMultiline(target.checked);
   };
 
-  handleMultilineToggle = ({ target }) => {
-    this.props.builder.toggleMultiline(target.checked);
+  handleDictumChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    this.context.builder.changeDictum(target.value);
   };
 
-  handleDictumChange = ({ target }) => {
-    this.props.builder.changeDictum(target.value);
+  handleAuthorToggle = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    this.context.builder.changeAuthor(target.checked ? '鲁迅' : '');
   };
 
-  handleAuthorToggle = ({ target }) => {
-    this.props.builder.changeAuthor(target.checked ? '鲁迅' : '');
+  handleAuthorChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    this.context.builder.changeAuthor(target.value);
   };
 
-  handleAuthorChange = ({ target }) => {
-    this.props.builder.changeAuthor(target.value);
-  };
-
-  handleColorChange = ({ hex }) => {
-    this.props.builder.changeTextColor(hex);
+  handleColorChange = ({ hex }: ColorResult) => {
+    this.context.builder.changeTextColor(hex);
   };
 
   render() {
     const {
       builder: { dictum, author, authorVisible, multiline, textColor, drawDictum, reset },
-    } = this.props;
+    } = this.context;
 
     return (
       <Card>
@@ -133,11 +137,3 @@ class DictumEdit extends Component {
     );
   }
 }
-
-const enhance = compose(
-  inject(({ store }) => ({
-    builder: store.builder,
-  })),
-  observer
-);
-export default enhance(DictumEdit);

@@ -1,56 +1,67 @@
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component, Fragment, Ref } from 'react';
 import { autorun, reaction } from 'mobx';
-import { inject, observer } from 'mobx-react';
-import compose from 'recompose/compose';
-import { Stage, Layer, Image, Text } from 'react-konva';
+import { observer } from 'mobx-react';
+import * as ReactKonva from 'react-konva';
+import * as Konva from 'konva';
 import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
-import memoize from 'memoize-one';
 
-class ImagePreview extends Component {
-  static propTypes = {
-    image: PropTypes.object,
-    builder: PropTypes.object.isRequired,
-    containerWidth: PropTypes.number,
-    containerHeight: PropTypes.number,
-  };
+import { StoreContext, RootStoreType } from '../stores';
 
-  static defaultProps = {
+export interface ImagePreviewProps {
+  innerRef: (el: ReactKonva.Stage) => void;
+  containerHeight: number;
+  containerWidth: number;
+}
+export interface ImagePreviewState {
+  image: HTMLImageElement | null;
+  error: Error | null;
+}
+
+@observer
+export class ImagePreview extends Component<ImagePreviewProps, ImagePreviewState> {
+  static contextType = StoreContext;
+  context!: RootStoreType;
+
+  static defaultProps: Partial<ImagePreviewProps> = {
     containerWidth: 600,
     containerHeight: 600,
   };
 
-  constructor(props) {
-    super(props);
+  authorTextRef = React.createRef<Konva.Text>();
+  dictumTextRef = React.createRef<Konva.Text>();
 
-    this.state = {
-      image: null,
-      error: null,
-    };
+  stageRef: ReactKonva.Stage | null = null;
+  setStageRef = (el: ReactKonva.Stage) => {
+    this.stageRef = el;
+    this.props.innerRef(el);
+  };
 
-    this.authorTextRef = React.createRef();
-    this.dictumTextRef = React.createRef();
-  }
+  shouldAdjustText: boolean = false;
+
+  state: ImagePreviewState = {
+    image: null,
+    error: null,
+  };
 
   componentDidMount = () => {
     autorun(() => {
-      this._createImage(this.props.builder.imageSrc);
+      this._createImage(this.context.builder.imageSrc);
     });
 
     reaction(
       () => ({
-        dictum: this.props.builder.dictum,
-        author: this.props.builder.author,
-        textColor: this.props.builder.textColor,
+        dictum: this.context.builder.dictum,
+        author: this.context.builder.author,
+        textColor: this.context.builder.textColor,
       }),
-      props => {
+      () => {
         this.shouldAdjustText = true;
       }
     );
   };
 
-  componentDidUpdate = (prevProps, { image }) => {
+  componentDidUpdate = (prevProps: ImagePreviewProps, { image }: ImagePreviewState) => {
     if (image !== this.state.image || this.shouldAdjustText) {
       this._adjustText();
       this.shouldAdjustText = false;
@@ -58,19 +69,19 @@ class ImagePreview extends Component {
   };
 
   handleImageReload = () => {
-    this._createImage(this.props.builder.imageSrc);
+    this._createImage(this.context.builder.imageSrc);
   };
 
   handleSnackbarClose = () => {
     this.setState({ error: null });
   };
 
-  _createImage(src) {
+  _createImage(src: string) {
     if (!src) {
       return;
     }
 
-    const { builder } = this.props;
+    const { builder } = this.context;
     builder.toggleLoading(true);
 
     const image = new window.Image();
@@ -82,7 +93,7 @@ class ImagePreview extends Component {
         image,
       });
     };
-    image.onerror = error => {
+    image.onerror = (error: Error) => {
       builder.toggleLoading(false);
       builder.changeImage('');
 
@@ -91,7 +102,7 @@ class ImagePreview extends Component {
   }
 
   _adjustText() {
-    const stageRef = this.props.forwardRef.current;
+    const stageRef = this.stageRef;
     const authorText = this.authorTextRef.current;
     const dictumText = this.dictumTextRef.current;
 
@@ -105,7 +116,11 @@ class ImagePreview extends Component {
     dictumText.y(authorTextY - dictumText.getHeight());
   }
 
-  _computeScale = memoize((containerWidth, containerHeight, image) => {
+  _computeScale = (
+    containerWidth: number,
+    containerHeight: number,
+    image: HTMLImageElement | null
+  ) => {
     if (!image) {
       return 1;
     }
@@ -113,9 +128,14 @@ class ImagePreview extends Component {
     const widthScale = Math.min(containerWidth, image.width) / image.width;
     const heightScale = Math.min(containerHeight, image.height) / image.height;
     return Math.min(widthScale, heightScale, 1);
-  });
+  };
 
-  _computeSize = (image, scale, containerWidth, containerHeight) => {
+  _computeSize = (
+    image: HTMLImageElement | null,
+    scale: number,
+    containerWidth: number,
+    containerHeight: number
+  ) => {
     if (!image) {
       return {
         width: containerWidth,
@@ -132,22 +152,24 @@ class ImagePreview extends Component {
   render() {
     const {
       builder: { dictum, author, textColor },
-      containerWidth,
-      containerHeight,
-      forwardRef,
-    } = this.props;
+    } = this.context;
+    const { innerRef, containerWidth, containerHeight } = this.props;
     const { image, error } = this.state;
     const scale = this._computeScale(containerWidth, containerHeight, image);
     const { width, height } = this._computeSize(image, scale, containerWidth, containerWidth);
 
     return (
       <Fragment>
-        <Stage ref={forwardRef} width={width} height={height}>
-          <Layer>
-            <Image image={image} preventDefault={false} scale={{ x: scale, y: scale }} />
+        <ReactKonva.Stage ref={this.setStageRef} width={width} height={height}>
+          <ReactKonva.Layer>
             {image && (
               <Fragment>
-                <Text
+                <ReactKonva.Image
+                  image={image!}
+                  preventDefault={false}
+                  scale={{ x: scale, y: scale }}
+                />
+                <ReactKonva.Text
                   ref={this.dictumTextRef}
                   width={width}
                   x={0}
@@ -160,7 +182,7 @@ class ImagePreview extends Component {
                   preventDefault={false}
                   draggable
                 />
-                <Text
+                <ReactKonva.Text
                   ref={this.authorTextRef}
                   width={width}
                   x={0}
@@ -176,8 +198,8 @@ class ImagePreview extends Component {
                 />
               </Fragment>
             )}
-          </Layer>
-        </Stage>
+          </ReactKonva.Layer>
+        </ReactKonva.Stage>
         <Snackbar
           anchorOrigin={{
             vertical: 'bottom',
@@ -200,11 +222,3 @@ class ImagePreview extends Component {
     );
   }
 }
-
-const enhance = compose(
-  inject(({ store }) => ({
-    builder: store.builder,
-  })),
-  observer
-);
-export default enhance(ImagePreview);

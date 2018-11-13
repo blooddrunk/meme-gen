@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { decorate, observable } from 'mobx';
-import compose from 'recompose/compose';
-import styled from 'styled-components';
-import { withTheme } from '@material-ui/core/styles';
+import { observable } from 'mobx';
+import { Theme } from '@material-ui/core/styles';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
-import ImageCard from '../components/ImageCard';
-import DictumEdit from '../components/DictumEdit';
+import styled, { ThemeContext } from '../theme';
+import { ImageCard } from '../components/ImageCard';
+import { DictumEdit } from '../components/DictumEdit';
 
 const Container = styled.section`
   display: grid;
@@ -37,7 +36,12 @@ const Alert = styled(SnackbarContent)`
   }
 `;
 
-class Home extends Component {
+@observer
+export class Home extends Component {
+  static contextType = ThemeContext;
+  context!: Theme;
+
+  @observable
   isAlertVisible = true;
 
   handleAlertClose = () => {
@@ -45,14 +49,12 @@ class Home extends Component {
   };
 
   render() {
-    const { theme } = this.props;
-
     return (
       <Container>
         {this.isAlertVisible && (
           <Alert
             message="Your browser seems to be out of date so that it lacks support of CSS Grid Layout."
-            theme={theme}
+            theme={this.context}
             action={[
               <IconButton
                 key="close"
@@ -71,12 +73,3 @@ class Home extends Component {
     );
   }
 }
-
-decorate(Home, {
-  isAlertVisible: observable,
-});
-const enhance = compose(
-  withTheme(),
-  observer
-);
-export default enhance(Home);
